@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="myMoney.Controls.InfoControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:myMoney.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="40" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock Text="my Money" FontFamily="Century Gothic" FontSize="50" FontWeight="Bold" HorizontalAlignment="Center" Foreground="#FF0F4E7A" Margin="10"/>
+        <Image Grid.Row="1" Source="..\Icons\money.png" Height="50" Margin="10" />
+        <TextBlock Grid.Row="3" Text="Supportanfragen und Verbesserungsvorschläge können an folgende e-Mail-Adresse gemeldet werden:" HorizontalAlignment="Center" />
+        <TextBlock Grid.Row="4" Text="werni.koch@bluewin.ch" HorizontalAlignment="Center" />
+        <TextBlock Grid.Row="6" Text="born in Switzerland" HorizontalAlignment="Center" />
+    </Grid>
+</UserControl>

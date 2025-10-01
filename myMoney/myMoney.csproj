@@ -1,0 +1,107 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>Icons\money.ico</ApplicationIcon>
+    <AssemblyVersion>2.1</AssemblyVersion>
+    <FileVersion>2.1</FileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Icons\bank.png" />
+    <None Remove="Icons\categorie.png" />
+    <None Remove="Icons\close.png" />
+    <None Remove="Icons\delete.ico" />
+    <None Remove="Icons\down.ico" />
+    <None Remove="Icons\geld.png" />
+    <None Remove="Icons\home.png" />
+    <None Remove="Icons\info.png" />
+    <None Remove="Icons\menu.png" />
+    <None Remove="Icons\money.png" />
+    <None Remove="Icons\new.ico" />
+    <None Remove="Icons\pdf.png" />
+    <None Remove="Icons\periodisch.png" />
+    <None Remove="Icons\refresh.ico" />
+    <None Remove="Icons\report.png" />
+    <None Remove="Icons\save.ico" />
+    <None Remove="Icons\schloss.png" />
+    <None Remove="Icons\setup.png" />
+    <None Remove="Icons\up.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Icons\money.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DeviceId" Version="6.6.0" />
+    <PackageReference Include="LiveCharts.Wpf.Core" Version="0.9.8" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.9" />
+    <PackageReference Include="PdfSharpCore" Version="1.3.62" />
+    <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Icons\bank.png" />
+    <Resource Include="Icons\categorie.png" />
+    <Resource Include="Icons\close.png" />
+    <Resource Include="Icons\delete.ico" />
+    <Resource Include="Icons\down.ico" />
+    <Resource Include="Icons\geld.png" />
+    <Resource Include="Icons\home.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Icons\info.png" />
+    <Content Include="Icons\menu.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Resource Include="Icons\money.png" />
+    <Resource Include="Icons\new.ico" />
+    <Resource Include="Icons\pdf.png" />
+    <Resource Include="Icons\refresh.ico" />
+    <Resource Include="Icons\periodisch.png" />
+    <Resource Include="Icons\report.png" />
+    <Resource Include="Icons\save.ico" />
+    <Resource Include="Icons\schloss.png" />
+    <Resource Include="Icons\setup.png" />
+    <Resource Include="Icons\up.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.fr.Designer.cs">
+      <DependentUpon>Resources.fr.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.fr.resx">
+      <LastGenOutput>Resources.fr.Designer.cs</LastGenOutput>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Icons\money.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

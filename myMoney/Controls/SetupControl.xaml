@@ -1,0 +1,103 @@
+﻿<UserControl x:Class="myMoney.Controls.SetupControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <GroupBox Header="Einstellungen" Margin="5">
+            <Grid>
+                <Grid.ColumnDefinitions >
+                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Währung" Margin="2" />
+                <TextBox Grid.Row="0" Grid.Column="1" x:Name="txtWhgId" MaxLength="3" Width="40" HorizontalAlignment="Left" Margin="2" />
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Anzahl Tage für Periodische Buchungen" Margin="2" />
+                <TextBox Grid.Row="1" Grid.Column="1" x:Name="txtAnzahlTage" Width="40" HorizontalAlignment="Left" Margin="2" />
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Sprache" Margin="2" />
+                <ComboBox Grid.Row="2" Grid.Column="1" Width="200" HorizontalAlignment="Left" x:Name="cbSprache" Margin="2" />
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Font" Margin="2" />
+                <ComboBox Grid.Row="3" Grid.Column="1" Width="300" HorizontalAlignment="Left" x:Name="cbFont" Margin="2" />
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="Passwort aktivieren" Margin="2" />
+                <CheckBox Grid.Row="4" x:Name="checkBoxPasswort" Grid.Column="1" Margin="2" />
+                <TextBlock Grid.Row="5" Grid.Column="0" Text="Passwort" Margin="2" />
+                <TextBox Grid.Row="5" Grid.Column="1" x:Name="txtPasswort" Width="200" HorizontalAlignment="Left"  IsEnabled="{Binding ElementName=checkBoxPasswort, Path=IsChecked}" Margin="2" />
+                <TextBlock Grid.Row="6" Grid.Column="0" Text="Vorschlagkonto" Margin="2" />
+                <ComboBox Grid.Row="6" Grid.Column="1" Width="300" HorizontalAlignment="Left" x:Name="cbKonto" Margin="2" />
+                <TextBlock Grid.Row="7" Grid.Column="0" Text="Startdiagramm" Margin="2" />
+                <StackPanel Grid.Row="7" Grid.Column="1" Orientation="Horizontal" Margin="2">
+                    <RadioButton x:Name="radioKontoSaldi" Content="Kontosaldi" Margin="2" />
+                    <RadioButton x:Name="radioEinAusgaben" Content="Ein- Ausgaben" Margin="2" />
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Grid.Row="1" Header="Datenbank" Margin="5">
+            <Grid>
+            <Grid.ColumnDefinitions >
+                <ColumnDefinition Width="150" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Daten" Margin="2" />
+                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Margin="2">
+                    <RadioButton x:Name="radioXML" Content="XML" Margin="2" />
+                    <RadioButton x:Name="radioSQL" Content="SQL" Margin="2" />
+                </StackPanel>
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Datenbank" Margin="2" />
+                <TextBox Grid.Row="1" Grid.Column="1" x:Name="txtDatenbank" Width="200" HorizontalAlignment="Left" Margin="2" />
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="User" Margin="2" />
+                <TextBox Grid.Row="2" Grid.Column="1" x:Name="txtDBUser" Width="200" HorizontalAlignment="Left" Margin="2" />
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Passwort" Margin="2" />
+                <TextBox Grid.Row="3" Grid.Column="1" x:Name="txtDBPasswort" Width="200" HorizontalAlignment="Left" Margin="2" />
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Grid.Row="2" Header="XML-Backup zurücklesen" Margin="5">
+            <Grid>
+                <Grid.ColumnDefinitions >
+                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Backup" Margin="2" />
+                <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="1">
+                    <ComboBox Width="200" x:Name="cbBackup" Margin="2" />
+                    <Button Content="Restore" Click="Button_Click_Restore" Margin="10, 2" />
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+
+        <Button Grid.Row="3" Grid.Column="0"  Click="Button_Click_Save" Margin="5" ToolTip="Speichern" Background="#FF0F4E7A" HorizontalAlignment="Right">
+            <Image Source="../Icons/save.ico" Height="20"/>
+        </Button>
+    </Grid>
+</UserControl>
