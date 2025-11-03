@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.Metrics;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -95,16 +94,15 @@ namespace myMoney.Controls
                 return;
 
             /* Konto darf nicht bebucht sein */
-            var buchungsListe = DataAccess.ReadBuchungen(item.Id);
-            if (buchungsListe.Count > 0)
-            {
-                txtFehler.Text = "Konto ist bebucht und kann nicht gelöscht werden";
-                txtFehler.Width = 300;
-                return;
-            }
-
-            KontoList.Remove(item);
-            DataAccess.WriteKontos(KontoList);
+            /*            var buchungsListe = DataAccess.ReadBuchungen(item.Id);
+                        if (buchungsListe.Count > 0)
+                        {
+                            txtFehler.Text = "Konto ist bebucht und kann nicht gelöscht werden";
+                            txtFehler.Width = 300;
+                            return;
+                        }
+            */
+            DataAccess.DeleteKonto(SelectedKonto);
             GetKontoData();
         }
 
@@ -134,18 +132,21 @@ namespace myMoney.Controls
             }
 
             if (IsNew)
-                KontoList.Add(SelectedKonto);
+            {
+                DataAccess.AddKonto(SelectedKonto);
+            }
             else
-                SelectedKonto = SelectedKonto;
+            {
+                DataAccess.UpdateKonto(SelectedKonto);
+            }
 
-            DataAccess.WriteKontos(KontoList);
             IsNew = false;
             GetKontoData();
         }
 
         private void Click_Up_Button(object sender, RoutedEventArgs e)
         {
-            Guid id = SelectedKonto.Id;
+            int id = SelectedKonto.Id;
             int pos = KontoList.FindIndex(x => x.Id == SelectedKonto.Id);
             if (pos <= 0)
             {
@@ -163,7 +164,11 @@ namespace myMoney.Controls
                 count++;    
             }
 
-            DataAccess.WriteKontos(KontoList);
+            foreach (var item in KontoList)
+            {
+                DataAccess.UpdateKonto(item);
+            }
+
             IsNew = false;
             GetKontoData();
 
@@ -173,7 +178,7 @@ namespace myMoney.Controls
         private void Click_Down_Button(object sender, RoutedEventArgs e)
         {
             int pos = KontoList.FindIndex(x => x.Id == SelectedKonto.Id);
-            if (pos >= KontoList.Count)
+            if (pos >= KontoList.Count-1)
             {
                 return;
             }
@@ -189,7 +194,11 @@ namespace myMoney.Controls
                 count++;
             }
 
-            DataAccess.WriteKontos(KontoList);
+            foreach (var item in KontoList)
+            {
+                DataAccess.UpdateKonto(item);
+            }
+
             IsNew = false;
             GetKontoData();
 
@@ -200,7 +209,6 @@ namespace myMoney.Controls
         #region Tools
         private void GetKontoData()
         {
-            KontoList = new List<Konto>();
             KontoList = DataAccess.ReadKontos();
             DataGrid.ItemsSource = KontoList;
 

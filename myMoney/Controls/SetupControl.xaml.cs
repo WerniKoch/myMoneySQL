@@ -35,16 +35,17 @@ namespace myMoney.Controls
             if (radioKontoSaldi.IsChecked == true)
                 startDiagramm = enStartDiagramm.enKontosaldi;
 
-            Guid konto = Guid.Empty;
-            if (cbKonto.SelectedValue != null)
+            DataAccess.SetSetup(new Setup()
             {
-                konto = (Guid)cbKonto.SelectedValue;
-            }
-
-            string datenhaltung = (radioXML.IsChecked ?? true) ? "XML" : "SQL";
-
-            DataAccess.WriteSetup(txtWhgId.Text, txtAnzahlTage.Text, (enSprache) cbSprache.SelectedValue, (string) cbFont.SelectedValue,
-                txtPasswort.Text, checkBoxPasswort.IsChecked ?? false, konto, startDiagramm, datenhaltung, txtDatenbank.Text, txtDBUser.Text, txtDBPasswort.Text);
+                WaehrungId = txtWhgId.Text,
+                AnzahlTage = int.TryParse(txtAnzahlTage.Text, out int tage) ? tage : 0,
+                Sprache = cbSprache.SelectedValue?.ToString() ?? "DE",
+                Font = cbFont.SelectedValue?.ToString() ?? "Arial",
+                Passwort = txtPasswort.Text,
+                PasswortAktiv = checkBoxPasswort.IsChecked ?? false,
+                Vorschlagkonto = cbKonto.SelectedValue != null ? (int)cbKonto.SelectedValue : 0,
+                StartDiagramm = (int)startDiagramm,
+            });
         }
 
         private void Button_Click_Restore(object sender, RoutedEventArgs e)
@@ -60,10 +61,12 @@ namespace myMoney.Controls
         #region Tools
         private void LoadData()
         {
-            txtWhgId.Text = DataAccess.ReadSetupWaehrung();
-            txtAnzahlTage.Text = DataAccess.ReadSetupAnzahlTage();
-            txtPasswort.Text = DataAccess.ReadPasswort();
-            checkBoxPasswort.IsChecked = DataAccess.ReadPasswortAktiv();
+            Setup setup = DataAccess.ReadSetup();
+
+            txtWhgId.Text = setup.WaehrungId;
+            txtAnzahlTage.Text = setup.AnzahlTage.ToString();
+            txtPasswort.Text = setup.Passwort;
+            checkBoxPasswort.IsChecked = setup.PasswortAktiv;
 
             enStartDiagramm startDiagramm = DataAccess.ReadStartDiagramm();
             if (startDiagramm == enStartDiagramm.enKontosaldi)
@@ -72,23 +75,9 @@ namespace myMoney.Controls
                 radioEinAusgaben.IsChecked = true;
 
             LoadBackups();
-            LoadSprachen();
-            LoadFonts();
-            LoadKontos();
-
-            string datenhaltung = DataAccess.ReadDatenhaltung();
-            if (datenhaltung == "XML")
-            {
-                radioXML.IsChecked = true;
-            }
-            else
-            {
-                radioSQL.IsChecked = true;
-            }
-
-            txtDatenbank.Text = DataAccess.ReadDatenbank();
-            txtDBUser.Text = DataAccess.ReadDBUser();
-            txtDBPasswort.Text = DataAccess.ReadDBPasswort();
+            LoadSprachen(setup.Sprache);
+            LoadFonts(setup.Font);
+            LoadKontos(setup.Vorschlagkonto);
         }
 
         private void LoadBackups()
@@ -115,7 +104,7 @@ namespace myMoney.Controls
             cbBackup.ItemsSource = backupList;
         }
 
-        private void LoadSprachen()
+        private void LoadSprachen(string sprache)
         {
             Dictionary<enSprache, string> dictionary = new Dictionary<enSprache, string>
             {
@@ -126,10 +115,10 @@ namespace myMoney.Controls
             cbSprache.ItemsSource = dictionary;
             cbSprache.DisplayMemberPath = "Value";
             cbSprache.SelectedValuePath = "Key";
-            cbSprache.SelectedValue = DataAccess.ReadSprache();
+            cbSprache.SelectedValue = sprache;
         }
 
-        private void LoadFonts()
+        private void LoadFonts(string font)
         {
             List<string> fontsList = new List<string>();
 
@@ -142,16 +131,16 @@ namespace myMoney.Controls
             }
 
             cbFont.ItemsSource = fontsList;
-            cbFont.SelectedValue = DataAccess.ReadFont();
+            cbFont.SelectedValue = font;
         }
 
-        private void LoadKontos()
+        private void LoadKontos(int konto)
         {
             var kontoList = DataAccess.ReadKontos();
             cbKonto.ItemsSource = kontoList;
             cbKonto.DisplayMemberPath = "Bezeichnung";
             cbKonto.SelectedValuePath = "Id";
-            cbKonto.SelectedValue = DataAccess.ReadVorschlagKonto();
+            cbKonto.SelectedValue = konto;
         }
 
         private void RestoreBackup(string zip)

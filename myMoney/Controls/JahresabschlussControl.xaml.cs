@@ -34,7 +34,7 @@ namespace myMoney.Controls
         {
             if (MessageBox.Show("Jahr wirklich löschen?", "Löschen", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) != MessageBoxResult.Yes)
                 return;
-
+            /*
             var alleBuchungenList = DataAccess.ReadBuchungen(Guid.Empty);
 
             // Alle Konti durchloopen
@@ -61,9 +61,10 @@ namespace myMoney.Controls
                     konto.Saldo += kontosumme;
                 }
             }
-
+            
             DataAccess.WriteBuchungen(alleBuchungenList);
             DataAccess.WriteKontos(kontoList);
+            */
         }
     }
 }

@@ -16,6 +16,7 @@ namespace myMoney
 
         public LizenzWindow(string deviceId)
         {
+            Timer = new DispatcherTimer();
             InitializeComponent();
 
             tbCode.Text = deviceId;
@@ -33,7 +34,7 @@ namespace myMoney
         }
 
         #region Events
-        private void Timer_Tick(object sender, EventArgs e)
+        private void Timer_Tick(object? sender, EventArgs e)
         {
             Seconds--;
             tbZeit.Text = Seconds.ToString();

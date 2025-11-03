@@ -137,8 +137,7 @@ namespace myMoney.Controls
             if (item == null)
                 return;
 
-            PeriBuchungList.Remove(item);
-            DataAccess.WritePeriBuchungen(PeriBuchungList);
+            DataAccess.DeletePeriBuchung(SelectedPeriBuchung);
 
             GetPeriBuchungData();
         }
@@ -188,22 +187,24 @@ namespace myMoney.Controls
                 typ = enTyp.TransferZahlung;
             }
 
-            SelectedPeriBuchung.Konto = (Guid) cbKonto.SelectedValue;
-            SelectedPeriBuchung.EmpfangsKonto = (Guid) (cbEmpfangKonto.SelectedValue ?? Guid.Empty);
-            SelectedPeriBuchung.Kategorie = (Guid)(cbKategorie.SelectedValue ?? Guid.Empty);
+            SelectedPeriBuchung.Konto = (int) cbKonto.SelectedValue;
+            SelectedPeriBuchung.EmpfangsKonto = (int) (cbEmpfangKonto.SelectedValue ?? 0);
+            SelectedPeriBuchung.Kategorie = (int)(cbKategorie.SelectedValue ?? 0);
             SelectedPeriBuchung.StartDatum = dteStartDatum.DisplayDate;
             SelectedPeriBuchung.LastDatum = dteLastDatum.DisplayDate;
             SelectedPeriBuchung.WaehrungsId = txtWhgId.Text;
             SelectedPeriBuchung.BuchText = txtBuchtext.Text;
             SelectedPeriBuchung.Betrag = Betrag;
-            SelectedPeriBuchung.Typ = typ;
+            SelectedPeriBuchung.Typ = (int)typ;
 
             if (IsNew)
-                PeriBuchungList.Add(SelectedPeriBuchung);
+            {
+                DataAccess.AddPeriBuchung(SelectedPeriBuchung);
+            }
             else
-                SelectedPeriBuchung = SelectedPeriBuchung;
-
-            DataAccess.WritePeriBuchungen(PeriBuchungList);
+            {
+                DataAccess.UpdatePeriBuchung(SelectedPeriBuchung);
+            }
 
             IsNew = false;
             GetPeriBuchungData();
@@ -235,11 +236,11 @@ namespace myMoney.Controls
             cbEmpfangKonto.SelectedValue = SelectedPeriBuchung.EmpfangsKonto;
             cbKategorie.SelectedValue = SelectedPeriBuchung.Kategorie;
 
-            if (SelectedPeriBuchung.Typ == enTyp.Gutschrift)
+            if (SelectedPeriBuchung.Typ == (int)enTyp.Gutschrift)
             {
                 raTypGutschrift.IsChecked = true;
             }
-            else if (SelectedPeriBuchung.Typ == enTyp.TransferZahlung)
+            else if (SelectedPeriBuchung.Typ == (int)enTyp.TransferZahlung)
             {
                 raTypTransfer.IsChecked = true;
             }
@@ -247,7 +248,6 @@ namespace myMoney.Controls
             {
                 raTypZahlung.IsChecked = true;
             }
-
         }
         #endregion Tools
 

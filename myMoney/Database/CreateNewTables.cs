@@ -60,21 +60,43 @@ namespace myMoney.Database
             ";
                 command.ExecuteNonQuery();
 
+                // Tabelle: perioden
+                command.CommandText =
+                @"
+            CREATE TABLE IF NOT EXISTS peribuchungen (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                periodizitaet INTEGER,
+                startdatum DATE,
+                lastdatum DATE,
+                typ INTEGER,
+                konto INTEGER,
+                empfangskonto INTEGER,
+                waehrungsid TEXT,
+                betrag NUMERIC,
+                buchtext TEXT,
+                kategorie INTEGER
+            );
+            ";
+                command.ExecuteNonQuery();
+
                 // Tabelle: setup
                 command.CommandText =
                 @"
             CREATE TABLE IF NOT EXISTS setup (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                waehrung TEXT,
+                waehrungsid TEXT,
                 anzahltage INTEGER,
                 sprache TEXT,
                 font TEXT,
                 passwort TEXT,
                 passwortaktiv INTEGER,
                 vorschlagkonto INTEGER,
-                startdiagramm INTEGER,
-                datenhaltung TEXT,
-                datenbank TEXT
+                startdiagramm INTEGER
+            );
+            INSERT INTO setup (waehrungsid, anzahltage, sprache, font, passwortaktiv, startdiagramm)
+            SELECT 'CHF', 10, 'DE', 'Arial', 0, 0
+            WHERE NOT EXISTS (
+            SELECT 1 FROM setup
             );
             ";
                 command.ExecuteNonQuery();

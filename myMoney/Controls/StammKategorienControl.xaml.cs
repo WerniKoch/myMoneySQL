@@ -26,21 +26,21 @@ namespace myMoney.Controls
 
             if (KategorieList.Count == 0)
             {
-                Button_Click_New(null, null);
+                New();
             }
         }
 
         #region Properties
         List<Kategorie> KategorieList { get; set; } = new List<Kategorie>();
         bool IsNew { get; set; }
-        Guid SaveKategorieId { get; set; }
+        int SaveKategorieId { get; set; }
         bool IsShowAll { get; set; }
         #endregion Properties
 
         #region Tree
         private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            SaveKategorieId = Guid.Empty;
+            SaveKategorieId = 0;
 
             var tree = sender as TreeView;
             if (tree == null)
@@ -53,7 +53,7 @@ namespace myMoney.Controls
                 var item = tree.SelectedItem as TreeViewItem;
                 if (item != null && item.Tag != null)
                 {
-                    Guid id = (Guid)item.Tag;
+                    int id = (int)item.Tag;
                     SaveKategorieId = id;
                     FillOneKategorie(id);
                 }
@@ -68,6 +68,11 @@ namespace myMoney.Controls
 
         #region Buttons
         private void Button_Click_New(object sender, System.Windows.RoutedEventArgs e)
+        {
+            New();
+        }
+
+        private void New()
         {
             IsNew = true;
             BtnLoeschen.IsEnabled = false;
@@ -90,22 +95,23 @@ namespace myMoney.Controls
             if (item == null)
                 return;
 
-            Kategorie? kategorie = KategorieList.FirstOrDefault(x => x.Id == (Guid)item.Tag);
+            Kategorie? kategorie = KategorieList.FirstOrDefault(x => x.Id == (int)item.Tag);
             if (kategorie == null)
                 return;
 
             /* Kategorie darf nicht bebucht sein */
-            var kategorienListe = DataAccess.ReadBuchungen(Guid.Empty).Where(x => x.Kategorie == kategorie.Id).ToList();
+  /*          var kategorienListe = DataAccess.ReadBuchungen(Guid.Empty).Where(x => x.Kategorie == kategorie.Id).ToList();
             if (kategorienListe.Count > 0)
             {
                 txtFehler.Text = "Kategorie ist bebucht und kann nicht gelöscht werden";
                 txtFehler.Width = 300;
                 return;
             }
-
-            KategorieList.Remove(kategorie);
-            DataAccess.WriteKategorien(KategorieList);
+*/
+//            KategorieList.Remove(kategorie);
+            DataAccess.DeleteKategorie(kategorie);
             FillKategorien();
+  
         }
 
         private void Button_Click_Save(object sender, System.Windows.RoutedEventArgs e)
@@ -128,23 +134,18 @@ namespace myMoney.Controls
                 return;
             }
 
+            int inaktiv = cbInaktiv.IsChecked ?? false ? 1 : 0;
+            Kategorie kategorie = new Kategorie() {Id= SaveKategorieId, OberKategorie = txtOberkategorie.Text, UnterKategorie = txtUnterkategorie.Text, Inaktiv = inaktiv };
+
             if (IsNew)
             {
-                Kategorie kategorie = new Kategorie() { OberKategorie = txtOberkategorie.Text, UnterKategorie = txtUnterkategorie.Text, Inaktiv = cbInaktiv.IsChecked ?? false };
-                KategorieList.Add(kategorie);
+                DataAccess.AddKategorie(kategorie);
             }
             else
             {
-                var item = KategorieList.FirstOrDefault(x => x.Id == SaveKategorieId);
-                if (item != null)
-                {
-                    item.OberKategorie = txtOberkategorie.Text;
-                    item.UnterKategorie = txtUnterkategorie.Text;
-                    item.Inaktiv = cbInaktiv.IsChecked ?? false;
-                }
+                DataAccess.UpdateKategorie(kategorie);
             }
 
-            DataAccess.WriteKategorien(KategorieList);
             FillKategorien();
             IsNew = false;
             BtnLoeschen.IsEnabled = true;
@@ -155,7 +156,7 @@ namespace myMoney.Controls
         #region Tools
         private void FillKategorien()
         {
-            KategorieList = DataAccess.ReadKategorien(IsShowAll);
+            KategorieList = DataAccess.ReadKategorien();
             TreeKategorien.Items.Clear();
 
             Kategorie? oldKategorie = null;
@@ -186,7 +187,7 @@ namespace myMoney.Controls
             }
         }
 
-        private void FillOneKategorie(Guid id)
+        private void FillOneKategorie(int id)
         {
             Kategorie? kategorie = KategorieList.FirstOrDefault(x => x.Id == id);
             if (kategorie == null)
@@ -194,7 +195,7 @@ namespace myMoney.Controls
 
             txtOberkategorie.Text = kategorie.OberKategorie;
             txtUnterkategorie.Text = kategorie.UnterKategorie;
-            cbInaktiv.IsChecked = kategorie.Inaktiv;
+            cbInaktiv.IsChecked = kategorie.Inaktiv != 0;
         }
         #endregion Tools
     }

@@ -4,9 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:myMoney.Controls"
-             xmlns:glob="clr-namespace:System.Globalization;assembly=mscorlib"
+             xmlns:glob="clr-namespace:System.Globalization;assembly=mscorlib" 
+             xmlns:local1="clr-namespace:myMoney.Controler"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <local1:TypToTextConverter x:Key="TypToTextConverter"/>
+    </UserControl.Resources>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -82,7 +87,11 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Periodizität" Binding="{Binding Periodizitaet}" />
                 <DataGridTextColumn Header="Start" Binding="{Binding StartDatum, StringFormat=\{0:dd.MM.yyyy\}}" Width="70" />
-                <DataGridTextColumn Header="Typ" Binding="{Binding Typ}" Width="100" />
+                <DataGridTextColumn Header="Typ" Width="100">
+                    <DataGridTextColumn.Binding>
+                        <Binding Path="Typ" Converter="{StaticResource TypToTextConverter}" />
+                    </DataGridTextColumn.Binding>
+                </DataGridTextColumn>
                 <DataGridTextColumn Header="Buchungstext" Binding="{Binding BuchText}" />
                 <DataGridTextColumn Header="Währung" Binding="{Binding WaehrungsId}" />
                 <DataGridTextColumn Header="Betrag" Binding="{Binding Betrag, ConverterCulture='de-CH', StringFormat={}{0:n2}}" Width="150" >

@@ -16,6 +16,7 @@ namespace myMoney.Controls
     {
         public UebersichtControl()
         {
+            Items = new SeriesCollection();
             InitializeComponent();
             FillUebersichtGrid();
 
@@ -44,7 +45,7 @@ namespace myMoney.Controls
         {
             var kontoList = DataAccess.ReadKontos();
             var uebersichtList = new List<Uebersicht>();
-            var buchungsList = DataAccess.ReadBuchungen(Guid.Empty);
+            var buchungsList = DataAccess.ReadBuchungen(0);
             decimal totalSaldoHeute = 0m;
             decimal totalSaldo = 0m;
 
@@ -56,12 +57,12 @@ namespace myMoney.Controls
 				uebersicht.KontoId = konto.Id;
 
                 // Saldo
-                decimal saldoGutschrift = buchungsList.Where(x => x.Konto == konto.Id && (x.Typ == enTyp.Gutschrift || x.Typ == enTyp.TransferGutschrift)).Sum(x => x.Betrag);
-                decimal saldoZahlung = buchungsList.Where(x => x.Konto == konto.Id && (x.Typ == enTyp.Zahlung || x.Typ == enTyp.TransferZahlung)).Sum(x => x.Betrag);
+                decimal saldoGutschrift = buchungsList.Where(x => x.Konto == konto.Id && (x.Typ == (int)enTyp.Gutschrift || x.Typ == (int)enTyp.TransferGutschrift)).Sum(x => x.Betrag);
+                decimal saldoZahlung = buchungsList.Where(x => x.Konto == konto.Id && (x.Typ == (int)enTyp.Zahlung || x.Typ == (int)enTyp.TransferZahlung)).Sum(x => x.Betrag);
                 uebersicht.Saldo = konto.Saldo + saldoGutschrift - saldoZahlung;
 
-                decimal saldoGutschriftToday = buchungsList.Where(x => x.Konto == konto.Id && x.Datum <= DateTime.Today &&  (x.Typ == enTyp.Gutschrift || x.Typ == enTyp.TransferGutschrift)).Sum(x => x.Betrag);
-                decimal saldoZahlungToday = buchungsList.Where(x => x.Konto == konto.Id && x.Datum <= DateTime.Today && (x.Typ == enTyp.Zahlung || x.Typ == enTyp.TransferZahlung)).Sum(x => x.Betrag);
+                decimal saldoGutschriftToday = buchungsList.Where(x => x.Konto == konto.Id && x.Datum <= DateTime.Today &&  (x.Typ == (int)enTyp.Gutschrift || x.Typ == (int)enTyp.TransferGutschrift)).Sum(x => x.Betrag);
+                decimal saldoZahlungToday = buchungsList.Where(x => x.Konto == konto.Id && x.Datum <= DateTime.Today && (x.Typ == (int)enTyp.Zahlung || x.Typ == (int)enTyp.TransferZahlung)).Sum(x => x.Betrag);
                 uebersicht.SaldoToday = konto.Saldo + saldoGutschriftToday - saldoZahlungToday;
 
                 uebersichtList.Add(uebersicht);
@@ -117,7 +118,7 @@ namespace myMoney.Controls
             DataContext = this;
             Items = new SeriesCollection();
 
-            var buchungsListe = DataAccess.ReadBuchungen(Guid.Empty).Where(x => x.Datum.Year == DateTime.Now.Year);
+            var buchungsListe = DataAccess.ReadBuchungen(0).Where(x => x.Datum.Year == DateTime.Now.Year);
 
             decimal einnahmen = (from betrag in buchungsListe select betrag.Gutschrift).Sum();
             decimal ausgaben = (from betrag in buchungsListe select betrag.Zahlung).Sum();

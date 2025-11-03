@@ -20,12 +20,18 @@ namespace myMoney.Controls
     {
         public BuchenControl()
         {
+            BuchungList = new List<Buchung>();
+            TextList = new List<string>();
+            
             Init();
         }
 
         // Aufrufendes Konto selektieren
-        public BuchenControl(Guid kontoId)
+        public BuchenControl(int kontoId)
         {
+            BuchungList = new List<Buchung>();
+            TextList = new List<string>();
+            
             Init();
             cbKontoSelektion.SelectedValue = kontoId;
         }
@@ -35,14 +41,14 @@ namespace myMoney.Controls
             InitializeComponent();
             LastDate = DateTime.Now.Date;
             StackPanelRadio.IsEnabled = false;
-            FillKonti();
+            FillCombos();
             DataContext = this;
-            BuchungList = DataAccess.ReadBuchungen(Guid.Empty);
+            BuchungList = DataAccess.ReadBuchungen(0);
             TextList = await DataAccess.GetBuchungstexte();
 
             if (BuchungList.Count == 0)
             {
-                Button_Click_New(null, null);
+                New();
             }
         }
 
@@ -90,6 +96,11 @@ namespace myMoney.Controls
         #region Buttons
         private void Button_Click_New(object sender, System.Windows.RoutedEventArgs e)
         {
+            New();
+        }
+
+        private void New()
+        {
             IsNew = true;
             BtnLoeschen.IsEnabled = false;
             BtnNeu.IsEnabled = false;
@@ -114,29 +125,22 @@ namespace myMoney.Controls
             if (item == null)
                 return;
 
-            DeleteBuchung(item.Id);
-
-            DataAccess.WriteBuchungen(BuchungList);
+            DeleteBuchung(SelectedBuchung);
             FillGrid(SelectedBuchung.Konto);
         }
 
-        private void DeleteBuchung(Guid id)
+        private void DeleteBuchung(Buchung buchung)
         {
-            var item = BuchungList.FirstOrDefault(x => x.Id == id);
-            if (item == null)
-                return;
-
-            BuchungList.Remove(item);
+            DataAccess.DeleteBuchung(buchung);
 
             // Bei Transfer Gegenbuchung auch löschen
-            if (item.Typ == enTyp.TransferZahlung || item.Typ == enTyp.TransferGutschrift)
+            if (buchung.Typ == (int)enTyp.TransferZahlung || buchung.Typ == (int)enTyp.TransferGutschrift)
             {
-                var transItem = BuchungList.FirstOrDefault(x => x.Id == item.TransferId);
-                if (transItem != null)
-                {
-                    BuchungList.Remove(transItem);
-                }
+                Buchung transbuchung = new Buchung() { Id = buchung.TransferId };
+                DataAccess.DeleteBuchung(transbuchung);
             }
+
+            FillGrid(buchung.Konto);
         }
 
         private void Button_Click_Save(object sender, System.Windows.RoutedEventArgs e)
@@ -183,16 +187,6 @@ namespace myMoney.Controls
                 return;
             }
 
-            if (!IsNew)
-            {
-                var item = DataGrid.SelectedItem as Buchung;
-                if (item == null)
-                    return;
-
-                DeleteBuchung(item.Id);
-            }
-
-            Guid transferGuid = Guid.Empty;
             enTyp typ = enTyp.Gutschrift;
             if (raTypZahlung.IsChecked ?? false)
             {
@@ -201,43 +195,63 @@ namespace myMoney.Controls
             else if (raTypTransfer.IsChecked ?? false)
             {
                 typ = enTyp.TransferZahlung;
-                transferGuid = Guid.NewGuid();
             }
 
             Buchung buchung = new Buchung();
-            buchung.Id = Guid.NewGuid();
-            buchung.Konto = (Guid)cbKontoSelektion.SelectedValue;
-            buchung.Kategorie = (Guid)(cbKategorie.SelectedValue ?? Guid.Empty);
+            buchung.Konto = (int)cbKontoSelektion.SelectedValue;
+            buchung.Kategorie = (int)(cbKategorie.SelectedValue ?? Guid.Empty);
             buchung.Datum = dteDatum.DisplayDate;
             buchung.WaehrungsId = txtWhgId.Text;
             buchung.BuchText = txtBuchtext.Text;
             buchung.Betrag = Betrag;
-            buchung.TransferId = transferGuid;
-            buchung.Typ = typ;
+            buchung.TransferId = 0;
+            buchung.Typ = (int)typ;
 
-            BuchungList.Add(buchung);
+            int transferId = 0;
+            if (IsNew)
+            {
+                transferId = DataAccess.WriteBuchung(buchung);
+                buchung.Id = transferId;
+            }
+            else
+            {
+                buchung.Id = SelectedBuchung.Id;
+                buchung.TransferId = SelectedBuchung.TransferId;
+                DataAccess.UpdateBuchung(buchung);
+            }
 
             // Bei Transfer Gegenbuchung auch schreiben
             if (typ == enTyp.TransferZahlung)
             {
                 Buchung transBuchung = new Buchung();
-                transBuchung.Id = transferGuid;
-                transBuchung.Konto = (Guid) cbEmpfangKonto.SelectedValue;
-                transBuchung.Kategorie = (Guid)(cbKategorie.SelectedValue ?? Guid.Empty);
+                transBuchung.Konto = (int) cbEmpfangKonto.SelectedValue;
+                transBuchung.Kategorie = (int)(cbKategorie.SelectedValue ?? 0);
                 transBuchung.Datum = dteDatum.DisplayDate;
                 transBuchung.WaehrungsId = txtWhgId.Text;
                 transBuchung.BuchText = txtBuchtext.Text;
                 transBuchung.Betrag = Betrag;
-                transBuchung.TransferId = buchung.Id;
-                transBuchung.Typ = enTyp.TransferGutschrift;
+                transBuchung.TransferId = transferId;
+                transBuchung.Typ = (int)enTyp.TransferGutschrift;
 
-                BuchungList.Add(transBuchung);
+                if (IsNew)
+                {
+                    transferId = DataAccess.WriteBuchung(transBuchung);
+
+                    buchung.TransferId = transferId;
+                    DataAccess.UpdateBuchung(buchung);
+                }
+                else
+                {
+                    transBuchung.Id = SelectedBuchung.TransferId;
+                    transBuchung.TransferId = buchung.Id;
+                    DataAccess.UpdateBuchung(transBuchung);
+                }
+
             }
 
             LastDate = dteDatum.DisplayDate;
             IsNew = false;
             StackPanelRadio.IsEnabled = false;
-            DataAccess.WriteBuchungen(BuchungList);
             FillGrid(buchung.Konto);
         }
 
@@ -262,7 +276,7 @@ namespace myMoney.Controls
         #endregion Buttons
 
         #region Tools
-        private void FillKonti()
+        private void FillCombos()
         {
             var kontoList = DataAccess.ReadKontos();
             cbKontoSelektion.ItemsSource = kontoList;
@@ -307,11 +321,11 @@ namespace myMoney.Controls
             cbEmpfangKonto.SelectedValue = SelectedBuchung.TransferId;
             cbKategorie.SelectedValue = SelectedBuchung.Kategorie;
 
-            if (SelectedBuchung.Typ == enTyp.Gutschrift)
+            if (SelectedBuchung.Typ == (int)enTyp.Gutschrift)
             {
                 raTypGutschrift.IsChecked = true;
             }
-            else if (SelectedBuchung.Typ == enTyp.TransferGutschrift || SelectedBuchung.Typ == enTyp.TransferZahlung)
+            else if (SelectedBuchung.Typ == (int)enTyp.TransferGutschrift || SelectedBuchung.Typ == (int)enTyp.TransferZahlung)
             {
                 raTypTransfer.IsChecked = true;
             }
@@ -323,14 +337,13 @@ namespace myMoney.Controls
             // Bei Tansfer Buchung holen und Konto setzen
             if (raTypTransfer.IsChecked == true)
             {
-                var transBuchung = DataAccess.ReadBuchungen(Guid.Empty).FirstOrDefault(x => x.Id == SelectedBuchung.TransferId);
+                var transBuchung = DataAccess.ReadBuchungen(0).FirstOrDefault(x => x.Id == SelectedBuchung.TransferId);
                 if (transBuchung != null)
                 {
                     cbEmpfangKonto.SelectedValue = transBuchung.Konto;
                 }
             }
         }
-
         #endregion Tools
 
         #region ComboSelektion
@@ -341,11 +354,11 @@ namespace myMoney.Controls
             if (item == null)
                 return;
 
-            Guid kontoId = (Guid)item.SelectedValue;
+            int kontoId = (int)item.SelectedValue;
             FillGrid(kontoId);
         }
 
-        private void FillGrid(Guid kontoId)
+        private void FillGrid(int kontoId)
         { 
             var kontoList = DataAccess.ReadKontos();
             var buchungsList = DataAccess.ReadBuchungen(kontoId);
@@ -358,14 +371,15 @@ namespace myMoney.Controls
 
             foreach (var buchung in buchungsList)
             {
-
-                if (buchung.Typ == enTyp.Zahlung || buchung.Typ == enTyp.TransferZahlung)
+                if (buchung.Typ == (int)enTyp.Zahlung || buchung.Typ == (int)enTyp.TransferZahlung)
                 {
                     saldo -= buchung.Betrag;
+                    buchung.Zahlung = buchung.Betrag;
                 }
                 else
                 {
                     saldo += buchung.Betrag;
+                    buchung.Gutschrift = buchung.Betrag;
                 }
 
                 buchung.Saldo = saldo;
@@ -373,7 +387,7 @@ namespace myMoney.Controls
                 if (buchung.Datum <= DateTime.Now) 
                     saldoHeute = saldo;
 
-                if (buchung.Kategorie == Guid.Empty)
+                if (buchung.Kategorie == 0)
                     continue;
 
                 buchung.KategorieText = kategorieList?.FirstOrDefault(x => x.Id == buchung.Kategorie)?.UnterOberKategorie ?? string.Empty;
@@ -391,8 +405,7 @@ namespace myMoney.Controls
             txtSaldoZukunft.Text = saldo.ToString("###,###,##0.00");
 
             // Immer im New-Modus starten
-            Button_Click_New(new object(), new RoutedEventArgs());
-
+            New();
         }
         #endregion ComboSelektion
 

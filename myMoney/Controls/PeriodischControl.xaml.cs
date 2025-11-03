@@ -38,7 +38,7 @@ namespace myMoney.Controls
 
             BuchungList = new List<Periodisch>();
 
-            foreach (var item in periBuchungen)
+            foreach (PeriBuchung item in periBuchungen)
             {
                 var buchung = new Periodisch();
                 buchung.IsSelektiert = true;
@@ -48,11 +48,10 @@ namespace myMoney.Controls
                 buchung.Kategorie = kategorieList?.Find(x => x.Id == item.Kategorie)?.UnterOberKategorie ?? string.Empty;
                 buchung.WaehrungsId = item.WaehrungsId;
                 buchung.Betrag = item.Betrag;
-                buchung.TypText = GetTyp(item.Typ);
+                buchung.Typ = item.Typ;
 
                 // Nicht im Grid angezeigt
                 buchung.KontoId = item.Konto;
-                buchung.Typ = item.Typ;
                 buchung.KategorieId = item.Kategorie;
                 buchung.GegenKontoId = item.EmpfangsKonto;
                 buchung.Id = item.Id;
@@ -73,13 +72,9 @@ namespace myMoney.Controls
         {
             Cursor = Cursors.Wait;
 
-            var buchungListe = DataAccess.ReadBuchungen(Guid.Empty);
             var gridListe = DataGrid.ItemsSource;
-            var periBuchungen = DataAccess.ReadPeriBuchungen();
-
 
             bool isVerbucht = false;
-            Guid transferGuid = Guid.Empty;
 
             foreach (Periodisch item in gridListe)
             {
@@ -87,51 +82,45 @@ namespace myMoney.Controls
                     continue;
 
                 Buchung buchung = new Buchung();
-                buchung.Id = Guid.NewGuid();
                 buchung.Konto = item.KontoId;
                 buchung.Kategorie = item.KategorieId;
                 buchung.Datum = item.Datum;
                 buchung.WaehrungsId = item.WaehrungsId;
                 buchung.BuchText = item.BuchText;
                 buchung.Betrag = item.Betrag;
-                buchung.TransferId = transferGuid;
-                buchung.Typ = item.Typ;
+                buchung.TransferId = 0;
+                buchung.Typ = (int)enTyp.Zahlung;
 
-                buchungListe.Add(buchung);
+                int transferId = DataAccess.WriteBuchung(buchung);
                 isVerbucht = true;
 
                 // Bei Transfer Gegenbuchung auch schreiben
-                if (item.Typ == enTyp.TransferZahlung)
+                if (item.Typ == (int)enTyp.TransferZahlung)
                 {
                     Buchung transBuchung = new Buchung();
-                    transBuchung.Id = transferGuid;
                     transBuchung.Konto = item.GegenKontoId;
                     transBuchung.Kategorie = item.KategorieId;
                     transBuchung.Datum = item.Datum;
                     transBuchung.WaehrungsId = item.WaehrungsId;
                     transBuchung.BuchText = item.BuchText;
                     transBuchung.Betrag = item.Betrag;
-                    transBuchung.TransferId = buchung.Id;
-                    transBuchung.Typ = enTyp.TransferGutschrift;
+                    transBuchung.TransferId = transferId;
+                    transBuchung.Typ = (int)enTyp.Gutschrift;
 
-                    buchungListe.Add(transBuchung);
+                    transferId = DataAccess.WriteBuchung(transBuchung);
+
+                    buchung.TransferId = transferId; // TransferId in erste Buchung schreiben
+                    DataAccess.UpdateBuchung(buchung); // TransferId in erste Buchung schreiben
                 }
 
                 // Letzte Ausführung setzen (LastDatum)
-                var actPeriBhg = periBuchungen.Find(x => x.Id == item.Id);
-                if (actPeriBhg != null)
-                {
-                    actPeriBhg.LastDatum = item.Datum;
-                }
+                DataAccess.UpdatePeriBuchungDatum(item.Id, item.Datum);
             }
 
             Cursor = Cursors.Arrow;
 
             if (isVerbucht)
             {
-                DataAccess.WriteBuchungen(buchungListe);
-                DataAccess.WritePeriBuchungen(periBuchungen);
-
                 MessageBox.Show("Periodische Buchungen wurden verbucht", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
                 BtnVerbuchen.IsEnabled = false;
             }

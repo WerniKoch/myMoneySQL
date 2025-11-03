@@ -4,8 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:myMoney.Controls"
+             xmlns:local1="clr-namespace:myMoney.Controler"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <local1:TypToTextConverter x:Key="TypToTextConverter"/>
+    </UserControl.Resources>
 
     <Grid>
             <Grid.RowDefinitions>
@@ -49,7 +53,11 @@
                 <DataGridTextColumn Header="Konto" Binding="{Binding Konto}" Width="150" IsReadOnly="True" />
                 <DataGridTextColumn Header="Text" Binding="{Binding BuchText}" Width="250" />
                 <DataGridTextColumn Header="Kategorie" Binding="{Binding Kategorie}" Width="150" IsReadOnly="True" />
-                <DataGridTextColumn Header="Typ" Binding="{Binding TypText}" Width="100" IsReadOnly="True" />
+                <DataGridTextColumn Header="Typ" Width="100">
+                    <DataGridTextColumn.Binding>
+                        <Binding Path="Typ" Converter="{StaticResource TypToTextConverter}" />
+                    </DataGridTextColumn.Binding>
+                </DataGridTextColumn>
                 <DataGridTextColumn Header="Währung" Binding="{Binding WaehrungsId}" Width="75" IsReadOnly="True" />
                 <DataGridTextColumn Header="Betrag" Binding="{Binding Betrag, ConverterCulture='de-CH', StringFormat={}{0:n2}}" Width="150" >
                     <DataGridTextColumn.HeaderStyle>

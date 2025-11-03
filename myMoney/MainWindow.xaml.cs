@@ -3,7 +3,6 @@ using myMoney.Controls;
 using myMoney.Database;
 using myMoney.DTO;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Reflection;
@@ -47,7 +46,6 @@ namespace myMoney
             {
                 Close();
             }
-
 
             InitializeComponent();
 
@@ -188,36 +186,44 @@ namespace myMoney
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            BackupData();
+             BackupData();
         }
         #endregion Buttons
 
         #region Backup
         private void BackupData()
         {
-            List<string> liste = DataAccess.GetDataFilesToBackup();
-#if DEBUG
-            string backupDirectory = Environment.CurrentDirectory + "\\Backup\\";
-#else
-            string backupDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\myMoney\\Daten\\Backup\\";
-#endif
+            string backupFile = DataAccess.GetDataFileToBackup();
+            string backupDirectory = Path.GetDirectoryName(backupFile) + @"\Backup\";
 
-            if (!Directory.Exists(backupDirectory))
+            try
             {
-                Directory.CreateDirectory(backupDirectory);
-            }
-
-            string backupDatei = backupDirectory + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_Backup.zip";
-            using (ZipArchive zip = ZipFile.Open(backupDatei, ZipArchiveMode.Create))
-            {
-                foreach (var item in liste)
+                if (!Directory.Exists(backupDirectory))
                 {
-                    string fileName = Path.GetFileName(item);
-                    if (File.Exists(fileName))
-                    {
-                        zip.CreateEntryFromFile(item, fileName);
-                    }
+                    Directory.CreateDirectory(backupDirectory);
                 }
+
+                // File kopieren
+                string fileToZip = backupDirectory + Path.GetFileName(backupFile);
+                File.Copy(backupFile, fileToZip, true);
+
+                // File zippen
+                string backupDatei = backupDirectory + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_Backup.zip";
+                using (ZipArchive zip = ZipFile.Open(backupDatei, ZipArchiveMode.Create))
+                {
+                        string fileName = Path.GetFileName(backupFile);
+                        if (File.Exists(fileName))
+                        {
+                            zip.CreateEntryFromFile(fileToZip, fileName);
+                        }
+                }
+
+                // und wieder löschen
+                File.Delete(fileToZip);
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.Message, "Backup", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         #endregion Backup

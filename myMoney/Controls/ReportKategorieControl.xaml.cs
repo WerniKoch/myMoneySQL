@@ -20,6 +20,7 @@ namespace myMoney.Controls
 
         public ReportKategorieControl()
         {
+            Items = new SeriesCollection();
             InitializeComponent();
 
             SetDatum();
@@ -51,7 +52,7 @@ namespace myMoney.Controls
             }
 
             // Alle Buchungen im Zeitraum
-            var listBuchungen = DataAccess.ReadBuchungen(Guid.Empty).Where(x => x.Datum >= dteDatumVon.SelectedDate && x.Datum <= dteDatumBis.SelectedDate);
+            var listBuchungen = DataAccess.ReadBuchungen(0).Where(x => x.Datum >= dteDatumVon.SelectedDate && x.Datum <= dteDatumBis.SelectedDate);
             // Alle Kategoriene mit selekierter Oberkategorie
             var kategorieList = DataAccess.ReadKategorien().Where(x => x.OberKategorie == selKategorie);
 

@@ -11,7 +11,6 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <GroupBox Header="Einstellungen" Margin="5">
@@ -53,33 +52,7 @@
             </Grid>
         </GroupBox>
 
-        <GroupBox Grid.Row="1" Header="Datenbank" Margin="5">
-            <Grid>
-            <Grid.ColumnDefinitions >
-                <ColumnDefinition Width="150" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Daten" Margin="2" />
-                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Margin="2">
-                    <RadioButton x:Name="radioXML" Content="XML" Margin="2" />
-                    <RadioButton x:Name="radioSQL" Content="SQL" Margin="2" />
-                </StackPanel>
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Datenbank" Margin="2" />
-                <TextBox Grid.Row="1" Grid.Column="1" x:Name="txtDatenbank" Width="200" HorizontalAlignment="Left" Margin="2" />
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="User" Margin="2" />
-                <TextBox Grid.Row="2" Grid.Column="1" x:Name="txtDBUser" Width="200" HorizontalAlignment="Left" Margin="2" />
-                <TextBlock Grid.Row="3" Grid.Column="0" Text="Passwort" Margin="2" />
-                <TextBox Grid.Row="3" Grid.Column="1" x:Name="txtDBPasswort" Width="200" HorizontalAlignment="Left" Margin="2" />
-            </Grid>
-        </GroupBox>
-
-        <GroupBox Grid.Row="2" Header="XML-Backup zurücklesen" Margin="5">
+        <GroupBox Grid.Row="1" Header="XML-Backup zurücklesen" Margin="5">
             <Grid>
                 <Grid.ColumnDefinitions >
                     <ColumnDefinition Width="150" />
@@ -96,7 +69,7 @@
             </Grid>
         </GroupBox>
 
-        <Button Grid.Row="3" Grid.Column="0"  Click="Button_Click_Save" Margin="5" ToolTip="Speichern" Background="#FF0F4E7A" HorizontalAlignment="Right">
+        <Button Grid.Row="2" Grid.Column="0"  Click="Button_Click_Save" Margin="5" ToolTip="Speichern" Background="#FF0F4E7A" HorizontalAlignment="Right">
             <Image Source="../Icons/save.ico" Height="20"/>
         </Button>
     </Grid>

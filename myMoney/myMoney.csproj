@@ -6,9 +6,14 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>Icons\money.ico</ApplicationIcon>
-    <AssemblyVersion>2.1</AssemblyVersion>
-    <FileVersion>2.1</FileVersion>
+    <AssemblyVersion>3.0</AssemblyVersion>
+    <FileVersion>3.0</FileVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="DataAccessXML.cs" />
+    <Compile Remove="IDataAccess.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Remove="Icons\bank.png" />

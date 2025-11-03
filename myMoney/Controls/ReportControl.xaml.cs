@@ -51,7 +51,7 @@ namespace myMoney.Controls
 
             // Alle Daten innerhalb vom Datum gruppiert nach Kategorie
             var kategorieList = DataAccess.ReadKategorien();
-            var listDaten = DataAccess.ReadBuchungen(Guid.Empty).Where(x => x.Datum >= dteDatumVon.SelectedDate && x.Datum <= dteDatumBis.SelectedDate);
+            var listDaten = DataAccess.ReadBuchungen(0).Where(x => x.Datum >= dteDatumVon.SelectedDate && x.Datum <= dteDatumBis.SelectedDate);
 
             var results = listDaten.GroupBy(p => p.Kategorie)
                 .Select(res => new

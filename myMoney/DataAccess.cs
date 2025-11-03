@@ -1,25 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Xml.Serialization;
+﻿using Microsoft.Win32;
 using myMoney.DTO;
-using System.Xml;
+using System;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
-using System.Windows;
 using System.Threading.Tasks;
-using Microsoft.Win32;
+using System.Windows;
 
 namespace myMoney
 {
     public static class DataAccess
     {
-#if DEBUG
-        private static string XMLSetup = Environment.CurrentDirectory + "\\Setup.xml";
-#else
-        private static string XMLSetup = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\myMoney\\Daten\\Setup.xml";
-#endif
-
         const string PWEncodeDecode = "MoreMoney4All";
         private static bool IsDemoLizenz = true;
 
@@ -36,260 +27,172 @@ namespace myMoney
 
         #region Backup
         // Liste aller Files zum Backupen
-        public static List<string> GetDataFilesToBackup()
+        public static string GetDataFileToBackup()
         {
-            if (ReadDatenhaltung() == "XML")
-            {
-                DataAccessXML dataAccessXML = new DataAccessXML();
-                return dataAccessXML.GetDataFilesToBackup();
-            }
-            else
-            {
-                MessageBox.Show("SQL not implemented yet!");
-                return new List<string>();
-            }
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            return dataAccessSQL.GetDataFile();
         }
         #endregion Backup
 
         #region Kontos
         public static List<Konto> ReadKontos()
         {
-            if (ReadDatenhaltung() == "XML")
-            {
-                DataAccessXML dataAccessXML = new DataAccessXML();
-                return dataAccessXML.ReadKontos();
-            }
-            else
-            {
-                DataAccessSQL dataAccessSQL = new DataAccessSQL();
-                return dataAccessSQL.ReadKontos();
-            }
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            return dataAccessSQL.ReadKontos();
         }
 
-        public static void WriteKontos(List<Konto> list)
+        public static void AddKonto(Konto konto)
         {
-            if (ReadDatenhaltung() == "XML")
-            {
-                DataAccessXML dataAccessXML = new DataAccessXML();
-                dataAccessXML.WriteKontos(list);
-            }
-            else
-            {
-                DataAccessSQL dataAccessSQL = new DataAccessSQL();
-                dataAccessSQL.WriteKontos(list);
-            }
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            dataAccessSQL.AddKonto(konto);
+        }
+
+        public static void UpdateKonto(Konto konto)
+        {
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            dataAccessSQL.UpdateKonto(konto);
+        }
+
+        public static void DeleteKonto(Konto konto)
+        {
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            dataAccessSQL.DeleteKonto(konto);
         }
         #endregion Kontos
 
         #region Kategorien
+        public static void AddKategorie(Kategorie kategorie)
+        {
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            dataAccessSQL.AddKategorie(kategorie);
+        }
+
+        public static void UpdateKategorie(Kategorie kategorie)
+        {
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            dataAccessSQL.UpdateKategorie(kategorie);
+        }
+
+        public static void DeleteKategorie(Kategorie kategorie)
+        {
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            dataAccessSQL.DeleteKategorie(kategorie);
+        }
+
         public static List<Kategorie> ReadKategorien(bool isAlle=true)
         {
-            if (ReadDatenhaltung() == "XML")
-            {
-                DataAccessXML dataAccessXML = new DataAccessXML();
-                return dataAccessXML.ReadKategorien(isAlle);
-            }
-            else
-            {
-                DataAccessSQL dataAccessSQL = new DataAccessSQL();
-                return dataAccessSQL.ReadKategorien();
-            }
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            return dataAccessSQL.ReadKategorien();
         }
 
         public static List<string> ReadOberKategorien()
         {
-            if (ReadDatenhaltung() == "XML")
-            {
-                DataAccessXML dataAccessXML = new DataAccessXML();
-                return dataAccessXML.ReadOberKategorien();
-            }
-            else
-            {
-                DataAccessSQL dataAccessSQL = new DataAccessSQL();
-                return dataAccessSQL.ReadOberKategorien();
-            }
-        }
-
-        public static void WriteKategorien(List<Kategorie> list)
-        {
-            if (ReadDatenhaltung() == "XML")
-            {
-                DataAccessXML dataAccessXML = new DataAccessXML();
-                dataAccessXML.WriteKategorien(list);
-            }
-            else
-            {
-                DataAccessSQL dataAccessSQL = new DataAccessSQL();
-                dataAccessSQL.WriteKategorien(list);
-            }
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            return dataAccessSQL.ReadOberKategorien();
         }
         #endregion Kategorien
 
         #region Buchungen
-        public static List<Buchung> ReadBuchungen(Guid konto)
+        public static List<Buchung> ReadBuchungen(int konto)
         {
-            DataAccessXML dataAccessXML = new DataAccessXML();
-            return dataAccessXML.ReadBuchungen(konto);
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            return dataAccessSQL.ReadBuchungen(konto);
         }
 
-        public static void WriteBuchungen(List<Buchung> list)
+        public static int WriteBuchung(Buchung buchung)
         {
-            DataAccessXML dataAccessXML = new DataAccessXML();
-            dataAccessXML.WriteBuchungen(list);
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            return dataAccessSQL.WriteBuchung(buchung);
+        }
+
+        public static void UpdateBuchung(Buchung buchung)
+        {
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            dataAccessSQL.UpdateBuchung(buchung);
+        }
+
+        public static void DeleteBuchung(Buchung buchung)
+        {
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            dataAccessSQL.DeleteBuchung(buchung);
         }
 
         // Jeden Text nur einmal 
         public static async Task<List<string>> GetBuchungstexte()
         {
-            DataAccessXML dataAccessXML = new DataAccessXML();
-            return await dataAccessXML.GetBuchungstexte();
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            return await dataAccessSQL.GetBuchungstexte();
         }
 
         public static int GetOldestJahr()
         {
-            DataAccessXML dataAccessXML = new DataAccessXML();
-            return dataAccessXML.GetOldestJahr();
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            return dataAccessSQL.GetOldestJahr();
         }
         #endregion Buchungen
 
         #region PeriBuchungen
         public static List<PeriBuchung> ReadPeriBuchungen()
         {
-            if (ReadDatenhaltung() == "XML")
-            {
-                DataAccessXML dataAccessXML = new DataAccessXML();
-                return dataAccessXML.ReadPeriBuchungen();
-            }
-            else
-            {
-                DataAccessSQL dataAccessSQL = new DataAccessSQL();
-                return dataAccessSQL.ReadPeriBuchungen();
-            }
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            return dataAccessSQL.ReadPeriBuchungen();
         }
 
         public static void WritePeriBuchungen(List<PeriBuchung> list)
         {
-            if (ReadDatenhaltung() == "XML")
-            {
-                DataAccessXML dataAccessXML = new DataAccessXML();
-                dataAccessXML.WritePeriBuchungen(list);
-            }
-            else
-            {
-                DataAccessSQL dataAccessSQL = new DataAccessSQL();
-                dataAccessSQL.WritePeriBuchungen(list);
-            }
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            dataAccessSQL.WritePeriBuchungen(list);
+        }
+
+        public static void DeletePeriBuchung(PeriBuchung peribuchung)
+        {
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            dataAccessSQL.DeletePeriBuchung(peribuchung);
+        }
+
+        public static void AddPeriBuchung(PeriBuchung peribuchung)
+        {
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            dataAccessSQL.AddPeriBuchung(peribuchung);
+        }
+
+        public static void UpdatePeriBuchung(PeriBuchung peribuchung)
+        {
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            dataAccessSQL.UpdatePeriBuchung(peribuchung);
+        }
+
+        public static void UpdatePeriBuchungDatum(int id, DateTime datum)
+        {
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            dataAccessSQL.UpdatePeriBuchungDatum(id, datum);
         }
         #endregion PeriBuchungen
 
-        #region Generisch
-        private static List<T> Deserialize<T>(string xML)
-        {
-            List<T> list;
-            XmlSerializer serializer = new XmlSerializer(typeof(List<T>));
-            using (TextReader reader = new StreamReader(xML))
-            {
-                list = (List<T>)serializer.Deserialize(reader);
-            }
-
-            return list ?? new List<T> { };
-        }
-
-        private static void Serialize<T>(List<T> list, string xMl)
-        {
-            XmlWriterSettings settings = new XmlWriterSettings();
-            settings.Indent = true; // CR LF im XML
-            XmlSerializer serializer = new XmlSerializer(typeof(List<T>));
-            using (XmlWriter writer = XmlWriter.Create(xMl, settings))
-            {
-                serializer.Serialize(writer, list);
-            }
-        }
-        #endregion Generisch
-
         #region Setup
-        public static void WriteSetup(string whgId, string anzahlTage, enSprache sprache, string font, string passwort, bool passwortAktiv, Guid vorschlagKonto, enStartDiagramm startDiagramm,
-            string datenhaltung, string datenbank, string dbUser, string dbPasswort)
+        public static Setup ReadSetup()
         {
-            string enPasswort = EncodePasswort(passwort, PWEncodeDecode);
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            return dataAccessSQL.ReadSetup();
+        }
 
-            XmlWriterSettings settings = new XmlWriterSettings();
-            settings.Indent = true; // CR LF im XML
-
-            XmlWriter xmlWriter = XmlWriter.Create(XMLSetup, settings);
-
-            xmlWriter.WriteStartDocument();
-            xmlWriter.WriteStartElement("Setup");
-
-            xmlWriter.WriteStartElement("Waehrung");
-            xmlWriter.WriteString(whgId);
-            xmlWriter.WriteEndElement();
-
-            xmlWriter.WriteStartElement("AnzahlTage");
-            xmlWriter.WriteString(anzahlTage);
-            xmlWriter.WriteEndElement();
-
-            xmlWriter.WriteStartElement("Sprache");
-            xmlWriter.WriteString(sprache.ToString());
-            xmlWriter.WriteEndElement();
-
-            xmlWriter.WriteStartElement("Font");
-            xmlWriter.WriteString(font);
-            xmlWriter.WriteEndElement();
-
-            xmlWriter.WriteStartElement("Passwort");
-            xmlWriter.WriteString(enPasswort);
-            xmlWriter.WriteEndElement();
-
-            xmlWriter.WriteStartElement("PasswortAktiv");
-            xmlWriter.WriteString(passwortAktiv ? "True" : "False");
-            xmlWriter.WriteEndElement();
-
-            xmlWriter.WriteStartElement("VorschlagKonto");
-            xmlWriter.WriteString(vorschlagKonto.ToString());
-            xmlWriter.WriteEndElement();
-
-            xmlWriter.WriteStartElement("StartDiagramm");
-            xmlWriter.WriteString(startDiagramm.ToString());
-            xmlWriter.WriteEndElement();
-
-            xmlWriter.WriteStartElement("datenhaltung");
-            xmlWriter.WriteString(datenhaltung.ToString());
-            xmlWriter.WriteEndElement();
-            xmlWriter.WriteStartElement("datenbank");
-            xmlWriter.WriteString(datenbank.ToString());
-            xmlWriter.WriteEndElement();
-            xmlWriter.WriteStartElement("dbUser");
-            xmlWriter.WriteString(dbUser.ToString());
-            xmlWriter.WriteEndElement();
-            xmlWriter.WriteStartElement("dbPasswort");
-            xmlWriter.WriteString(dbPasswort.ToString());
-            xmlWriter.WriteEndElement();
-
-            xmlWriter.WriteEndElement();
-
-            xmlWriter.WriteEndDocument();
-            xmlWriter.Close();
+        public static void SetSetup(Setup setup)
+        {
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            dataAccessSQL.SetSetup(setup);
         }
 
         public static string ReadSetupWaehrung()
         {
             string whgid = "CHF";
 
-            if (!File.Exists(XMLSetup))
-                return whgid;
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            Setup setup = dataAccessSQL.ReadSetup();
 
-            XmlReader xmlReader = XmlReader.Create(XMLSetup);
-            while (xmlReader.Read())
+            if (setup != null && !string.IsNullOrEmpty(setup.WaehrungId))
             {
-                if (xmlReader.IsStartElement() && xmlReader.Name.ToString() == "Waehrung")
-                {
-                    whgid = xmlReader.ReadString();
-                    break;
-                }
+                whgid = setup.WaehrungId;
             }
-
-            xmlReader.Close();
 
             return whgid;
         }
@@ -298,20 +201,13 @@ namespace myMoney
         {
             string anzahlTage = "10";
 
-            if (!File.Exists(XMLSetup))
-                return anzahlTage;
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            Setup setup = dataAccessSQL.ReadSetup();
 
-            XmlReader xmlReader = XmlReader.Create(XMLSetup);
-            while (xmlReader.Read())
+            if (setup != null)
             {
-                if (xmlReader.IsStartElement() && xmlReader.Name.ToString() == "AnzahlTage")
-                {
-                    anzahlTage = xmlReader.ReadString();
-                    break;
-                }
+                anzahlTage = setup.AnzahlTage.ToString();
             }
-
-            xmlReader.Close();
 
             return anzahlTage;
         }
@@ -320,25 +216,16 @@ namespace myMoney
         {
             enSprache sprache = enSprache.DE;
 
-            if (!File.Exists(XMLSetup))
-                return sprache;
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            Setup setup = dataAccessSQL.ReadSetup();
 
-            XmlReader xmlReader = XmlReader.Create(XMLSetup);
-            while (xmlReader.Read())
+            if (setup != null && !string.IsNullOrEmpty(setup.Sprache))
             {
-                if (xmlReader.IsStartElement() && xmlReader.Name.ToString() == "Sprache")
-                {
-                    string sprachetext = xmlReader.ReadString();
-                    if (sprachetext == "FR")
-                        sprache = enSprache.FR;
-                    else
-                        sprache = enSprache.DE;
-
-                    break;
-                }
+                if (setup.Sprache == "FR")
+                    sprache = enSprache.FR;
+                else
+                    sprache = enSprache.DE;
             }
-
-            xmlReader.Close();
 
             return sprache;
         }
@@ -347,20 +234,13 @@ namespace myMoney
         {
             string font = "Arial";
 
-            if (!File.Exists(XMLSetup))
-                return font;
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            Setup setup = dataAccessSQL.ReadSetup();
 
-            XmlReader xmlReader = XmlReader.Create(XMLSetup);
-            while (xmlReader.Read())
+            if (setup != null && !string.IsNullOrEmpty(setup.Font))
             {
-                if (xmlReader.IsStartElement() && xmlReader.Name.ToString() == "Font")
-                {
-                    font = xmlReader.ReadString();
-                    break;
-                }
+                font = setup.Font;
             }
-
-            xmlReader.Close();
 
             return font;
         }
@@ -369,92 +249,63 @@ namespace myMoney
         {
             string passwort = "";
 
-            if (!File.Exists(XMLSetup))
-                return passwort;
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            Setup setup = dataAccessSQL.ReadSetup();
 
-            XmlReader xmlReader = XmlReader.Create(XMLSetup);
-            while (xmlReader.Read())
+            if (setup != null && !string.IsNullOrEmpty(setup.Passwort))
             {
-                if (xmlReader.IsStartElement() && xmlReader.Name.ToString() == "Passwort")
-                {
-                    passwort = xmlReader.ReadString();
-                    break;
-                }
+                passwort = setup.Font;
             }
-
-            xmlReader.Close();
 
             return DecodePasswort(passwort, PWEncodeDecode);
         }
 
         public static bool ReadPasswortAktiv()
         {
-            if (!File.Exists(XMLSetup))
-                return false;
+            bool passwortAktiv = false;
 
-            string passwortAktiv=string.Empty;
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            Setup setup = dataAccessSQL.ReadSetup();
 
-            XmlReader xmlReader = XmlReader.Create(XMLSetup);
-            while (xmlReader.Read())
+            if (setup != null)
             {
-                if (xmlReader.IsStartElement() && xmlReader.Name.ToString() == "PasswortAktiv")
-                {
-                    passwortAktiv = xmlReader.ReadString();
-                    break;
-                }
+                passwortAktiv = setup.PasswortAktiv;
             }
 
-            xmlReader.Close();
-
-            return passwortAktiv == "True";
+            return passwortAktiv;
         }
 
         public static enStartDiagramm ReadStartDiagramm()
         {
-            if (!File.Exists(XMLSetup))
-                return enStartDiagramm.enEinAusgaben;
+            enStartDiagramm startDiagramm = enStartDiagramm.enEinAusgaben;
 
-            string startDiagramm = string.Empty;
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            Setup setup = dataAccessSQL.ReadSetup();
 
-            XmlReader xmlReader = XmlReader.Create(XMLSetup);
-            while (xmlReader.Read())
+            if (setup != null)
             {
-                if (xmlReader.IsStartElement() && xmlReader.Name.ToString() == "StartDiagramm")
+                if (setup.StartDiagramm == (int)enStartDiagramm.enKontosaldi)
                 {
-                    startDiagramm = xmlReader.ReadString();
-                    break;
+                    startDiagramm = enStartDiagramm.enKontosaldi;
                 }
             }
 
-            xmlReader.Close();
-
-            if (startDiagramm == "enKontosaldi")
-                return enStartDiagramm.enKontosaldi;
-
-            return enStartDiagramm.enEinAusgaben;
+            return startDiagramm;
         }
 
-        public static Guid ReadVorschlagKonto()
+        public static int ReadVorschlagKonto()
         {
-            Guid konto = Guid.Empty;
+            int konto = 0;
 
-            if (!File.Exists(XMLSetup))
-                return konto;
+            DataAccessSQL dataAccessSQL = new DataAccessSQL();
+            Setup setup = dataAccessSQL.ReadSetup();
 
-            XmlReader xmlReader = XmlReader.Create(XMLSetup);
-            while (xmlReader.Read())
+            if (setup != null)
             {
-                if (xmlReader.IsStartElement() && xmlReader.Name.ToString() == "VorschlagKonto")
-                {
-                    konto = new Guid(xmlReader.ReadString());
-                    break;
-                }
+                konto = setup.Vorschlagkonto;
             }
 
-            xmlReader.Close();
-
             return konto;
-
         }
 
         private static string EncodePasswort(string plainText, string? password=null)
@@ -496,95 +347,6 @@ namespace myMoney
 
             return string.Empty;
         }
-
-        public static string ReadDatenhaltung()
-        {
-            string datenhaltung = "XML";
-
-            if (!File.Exists(XMLSetup))
-                return datenhaltung;
-
-            XmlReader xmlReader = XmlReader.Create(XMLSetup);
-            while (xmlReader.Read())
-            {
-                if (xmlReader.IsStartElement() && xmlReader.Name.ToString() == "datenhaltung")
-                {
-                    datenhaltung = xmlReader.ReadString();
-                    break;
-                }
-            }
-
-            xmlReader.Close();
-
-            return datenhaltung;
-        }
-
-        public static string ReadDatenbank()
-        {
-            string datenbank = string.Empty;
-
-            if (!File.Exists(XMLSetup))
-                return datenbank;
-
-            XmlReader xmlReader = XmlReader.Create(XMLSetup);
-            while (xmlReader.Read())
-            {
-                if (xmlReader.IsStartElement() && xmlReader.Name.ToString() == "datenbank")
-                {
-                    datenbank = xmlReader.ReadString();
-                    break;
-                }
-            }
-
-            xmlReader.Close();
-
-            return datenbank;
-        }
-
-        public static string ReadDBUser()
-        {
-            string dbUser = string.Empty;
-
-            if (!File.Exists(XMLSetup))
-                return dbUser;
-
-            XmlReader xmlReader = XmlReader.Create(XMLSetup);
-            while (xmlReader.Read())
-            {
-                if (xmlReader.IsStartElement() && xmlReader.Name.ToString() == "dbUser")
-                {
-                    dbUser = xmlReader.ReadString();
-                    break;
-                }
-            }
-
-            xmlReader.Close();
-
-            return dbUser;
-        }
-
-        public static string ReadDBPasswort()
-        {
-            string dbPasswort = string.Empty;
-
-            if (!File.Exists(XMLSetup))
-                return dbPasswort;
-
-            XmlReader xmlReader = XmlReader.Create(XMLSetup);
-            while (xmlReader.Read())
-            {
-                if (xmlReader.IsStartElement() && xmlReader.Name.ToString() == "dbPasswort")
-                {
-                    dbPasswort = xmlReader.ReadString();
-                    break;
-                }
-            }
-
-            xmlReader.Close();
-
-            return dbPasswort;
-        }
-
         #endregion Setup
 
         #region Freischaltcode
@@ -602,11 +364,12 @@ namespace myMoney
         {
             string code = string.Empty;
 
-            RegistryKey key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\myMoney");
-            if (key != null)
+            using (RegistryKey? key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\myMoney"))
             {
-                code = key.GetValue("code")?.ToString() ?? string.Empty;
-                key.Close();
+                if (key != null)
+                {
+                    code = key.GetValue("code")?.ToString() ?? string.Empty;
+                }
             }
 
             return code;

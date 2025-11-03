@@ -1,5 +1,4 @@
-﻿using myMoney;
-using myMoney.DTO;
+﻿using myMoney.DTO;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,7 +8,7 @@ using System.Xml;
 using System.Xml.Serialization;
 
 
-public class DataAccessXML : IDataAccess
+public class DataAccessXML
 {
 #if DEBUG
     private static string XMLKonto = Environment.CurrentDirectory + "\\Kontos.xml";
@@ -49,9 +48,8 @@ public class DataAccessXML : IDataAccess
         // GUID setzen bei neuen Kategorien
         foreach (var item in list)
         {
-            if (item.Id == Guid.Empty)
+            if (item.Id == 0)
             {
-                item.Id = Guid.NewGuid();
             }
 
             // Position neu vergeben
@@ -81,7 +79,7 @@ public class DataAccessXML : IDataAccess
         }
         else
         {
-            kategorienList = Deserialize<Kategorie>(XMLKategorien).Where(x => !x.Inaktiv).OrderBy(x => x.OberKategorie).ThenBy(n => n.UnterKategorie).ToList();
+            kategorienList = Deserialize<Kategorie>(XMLKategorien).Where(x => x.Inaktiv == 0).OrderBy(x => x.OberKategorie).ThenBy(n => n.UnterKategorie).ToList();
         }
 
         return kategorienList;
@@ -109,54 +107,44 @@ public class DataAccessXML : IDataAccess
 
     public void WriteKategorien(List<Kategorie> list)
     {
-        // GUID setzen bei neuen Kategorien
-        foreach (var item in list)
-        {
-            if (item.Id == Guid.Empty)
-            {
-                item.Id = Guid.NewGuid();
-            }
-        }
-
         Serialize<Kategorie>(list, XMLKategorien);
     }
     #endregion Kategorien
 
     #region Buchungen
-    public List<Buchung> ReadBuchungen(Guid konto)
+    public List<Buchung> ReadBuchungen(int konto)
     {
         if (!File.Exists(XMLBuchungen))
         {
             return new List<Buchung>();
         }
 
-        List<Buchung> buchungsList;
+        List<Buchung> buchungsList = new List<Buchung>();
+        /*
+                if (konto == Guid.Empty)
+                    buchungsList = Deserialize<Buchung>(XMLBuchungen).OrderBy(x => x.Datum).ToList();
+                else
+                    buchungsList = Deserialize<Buchung>(XMLBuchungen).Where(x => x.Konto == konto).OrderByDescending(x => x.Datum).ToList();
 
-        if (konto == Guid.Empty)
-            buchungsList = Deserialize<Buchung>(XMLBuchungen).OrderBy(x => x.Datum).ToList();
-        else
-            buchungsList = Deserialize<Buchung>(XMLBuchungen).Where(x => x.Konto == konto).OrderByDescending(x => x.Datum).ToList();
-
-        foreach (var item in buchungsList)
-        {
-            if (item.Typ == enTyp.Zahlung || item.Typ == enTyp.TransferZahlung)
-            {
-                item.BetragMitVorzeichen = item.Betrag * -1;
-                item.Zahlung = item.Betrag;
-            }
-            else
-            {
-                item.BetragMitVorzeichen = item.Betrag;
-                item.Gutschrift = item.Betrag;
-            }
-        }
-
+                foreach (var item in buchungsList)
+                {
+                    if (item.Typ == enTyp.Zahlung || item.Typ == enTyp.TransferZahlung)
+                    {
+                        item.BetragMitVorzeichen = item.Betrag * -1;
+                        item.Zahlung = item.Betrag;
+                    }
+                    else
+                    {
+                        item.BetragMitVorzeichen = item.Betrag;
+                        item.Gutschrift = item.Betrag;
+                    }
+                }
+        */
         return buchungsList;
     }
 
-    public void WriteBuchungen(List<Buchung> list)
+    public void WriteBuchung(Buchung buchung)
     {
-        Serialize<Buchung>(list, XMLBuchungen);
     }
 
     // Jeden Text nur einmal 
@@ -181,7 +169,7 @@ public class DataAccessXML : IDataAccess
 
     public int GetOldestJahr()
     {
-        var buchList = ReadBuchungen(Guid.Empty);
+        var buchList = ReadBuchungen(0);
         if (buchList == null || buchList.Count == 0)
             return 0;
 
@@ -232,15 +220,6 @@ public class DataAccessXML : IDataAccess
 
     public void WritePeriBuchungen(List<PeriBuchung> list)
     {
-        // GUID setzen bei neuen Kategorien
-        foreach (var item in list)
-        {
-            if (item.Id == Guid.Empty)
-            {
-                item.Id = Guid.NewGuid();
-            }
-        }
-
         Serialize<PeriBuchung>(list, XMLPeriBuchungen);
     }
     #endregion PeriBuchungen
