@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Windows.Controls;
-using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
@@ -89,7 +88,7 @@ namespace myMoney.Controls
                 buchung.BuchText = item.BuchText;
                 buchung.Betrag = item.Betrag;
                 buchung.TransferId = 0;
-                buchung.Typ = (int)enTyp.Zahlung;
+                buchung.Typ = item.Typ; 
 
                 int transferId = DataAccess.WriteBuchung(buchung);
                 isVerbucht = true;
@@ -105,7 +104,7 @@ namespace myMoney.Controls
                     transBuchung.BuchText = item.BuchText;
                     transBuchung.Betrag = item.Betrag;
                     transBuchung.TransferId = transferId;
-                    transBuchung.Typ = (int)enTyp.Gutschrift;
+                    transBuchung.Typ = item.Typ == (int)enTyp.TransferZahlung ? (int)enTyp.TransferGutschrift : (int)enTyp.Gutschrift;
 
                     transferId = DataAccess.WriteBuchung(transBuchung);
 
@@ -128,16 +127,6 @@ namespace myMoney.Controls
         #endregion Buttons
 
         #region Tools
-        private string GetTyp(enTyp typ)
-        {
-            if (typ == enTyp.Zahlung)
-                return "Zahlung";
-            if (typ == enTyp.Gutschrift)
-                return "Gutschrift";
-
-            return "Transfer";
-        }
-
         // Monat und Jahr ersetzen 
         // Falls Monatsende Tag finden und setzen
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S6562:Always set the \"DateTimeKind\" when creating new \"DateTime\" instances", Justification = "<Pending>")]

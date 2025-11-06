@@ -221,7 +221,7 @@ namespace myMoney.Controls
             }
 
             // Bei Transfer Gegenbuchung auch schreiben
-            if (typ == enTyp.TransferZahlung)
+            if (raTypTransfer.IsChecked ?? false)
             {
                 Buchung transBuchung = new Buchung();
                 transBuchung.Konto = (int) cbEmpfangKonto.SelectedValue;

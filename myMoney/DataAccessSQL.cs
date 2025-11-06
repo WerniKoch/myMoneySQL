@@ -137,7 +137,8 @@ namespace myMoney
                 command.Parameters.AddWithValue("$kategorie", buchung.Kategorie);
                 command.Parameters.AddWithValue("$transferid", buchung.TransferId);
 
-                insertedId = (int?)command.ExecuteScalar() ?? 0;
+                var ret = (command.ExecuteScalar() ?? 0);
+                insertedId = Convert.ToInt32(ret);
             }
             catch (Exception)
             {
