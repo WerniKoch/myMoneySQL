@@ -152,7 +152,10 @@ namespace myMoney.Controls
             {
                 foreach (var item in zipItem.Entries)
                 {
-                    item.ExtractToFile(ProgrammVerzeichnis + item.FullName, true);
+                    item.ExtractToFile(ProgrammVerzeichnis + "X" + item.FullName, true);
+
+                    File.Copy(ProgrammVerzeichnis + "X" + item.FullName, ProgrammVerzeichnis + item.FullName, true);
+                    File.Delete(ProgrammVerzeichnis + "X" + item.FullName);
                 }
             }
 
